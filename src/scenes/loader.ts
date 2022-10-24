@@ -7,4 +7,21 @@
     super('Loader');
   }
 
+  preload() {
+    this.load.setPath('assets/');
+    this.load.spritesheet('fire', 
+        'CampFireFinished.png',
+        { frameWidth: 64, frameHeight: 64 }
+    );
+    this.load.spritesheet('grass',
+        'forestSix.png',
+        { frameWidth: 64, frameHeight: 64 }
+    )
+    this.load.once('complete', () => {
+      console.log('资源加载完毕')
+      this.scene.stop('Loader')
+      this.scene.start('Index')
+    })
+  }
+
 }
