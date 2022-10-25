@@ -10,8 +10,11 @@ import CONFIG from './consts/config'
 // 引用场景
 import Index from './scenes'
 import Loader from './scenes/loader'
+import Play from './scenes/play'
 
 const Game = new Phaser.Game(CONFIG)
 
-Game.scene.add('Index', Index, false)
+// 场景加载
 Game.scene.add('Loader', Loader, true)
+Game.scene.add('Index', Index, false)
+Game.scene.add('Play', Play, false)
