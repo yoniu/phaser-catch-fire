@@ -21,6 +21,7 @@ export default class Play extends Phaser.Scene {
   create() {
     this.createMapContainer() 
     this.createFire()
+    this.createBrick()
     this.initChangeEmitter()
   }
 
@@ -32,7 +33,7 @@ export default class Play extends Phaser.Scene {
     for(let i = 0; i <= 10; i++) {
       this.pp[i] = []
       for(let j = 0; j <= 10; j++){
-        let x = (j % 2 == 1) ? 25 + (i * GameObject.width * GameObject.scale) + (i * 10) : (i * GameObject.width * GameObject.scale) + (i * 10);
+        let x = (j % 2 == 1) ? (GameObject.width * GameObject.scale / 2) + (i * GameObject.width * GameObject.scale) + (i * 10) : (i * GameObject.width * GameObject.scale) + (i * 10);
         let y = (j * GameObject.height * GameObject.scale) + (j * 5);
         this.pp[i][j] = new Fire(this, {
           x, y,
@@ -61,33 +62,60 @@ export default class Play extends Phaser.Scene {
     })
   }
 
+  createBrick() {
+    const count = 20
+    for(let i = 1; i <= count; i++) {
+      const x = this.getRandom(10),
+            y = this.getRandom(10)
+      if(this.pp[x][y].spriteState == FireState.OnFire || this.pp[x][y].spriteState == FireState.Brick)
+        i--
+      else
+        this.pp[x][y].changeBrick()
+    }
+  }
+
   initChangeEmitter() {
     ChangeEmitter.on('click', () => {
       let direction = this.currentFire.direction
       const {x, y} = this.currentFire.position
       const nearMaps = this.pp[x][y].nearMap()
-      let times = 0
-      while(true) {
-        times++
-        const newPosition = nearMaps[direction]
-        const nextFire = this.pp[newPosition.x][newPosition.y]
-        if(nextFire.spriteState == FireState.Brick || nextFire.spriteState == FireState.OnFire) {
-          if(times >= 6) break;
-          direction = this.getRandom(6)
-          continue;
-        } else {
-          nextFire.changeFire()
-          this.currentFire = {
-            position: {
-              x: newPosition.x,
-              y: newPosition.y
-            },
-            direction
+      let times = 0 // 内循环次数
+      if(x == 0 || x == 10 || y == 0 || y == 10)
+        ChangeEmitter.emit('gameover')
+      else
+        while(true) {
+          times++
+          const newPosition = nearMaps[direction]
+          const nextFire = this.pp[newPosition.x][newPosition.y]
+          if(nextFire.spriteState == FireState.Brick || nextFire.spriteState == FireState.OnFire) {
+            if(times > 6) {
+              ChangeEmitter.emit('gameover')
+              break
+            }
+            for(let i = 0; i < nearMaps.length; i++) {
+              const nextFire = this.pp[nearMaps[i].x][nearMaps[i].y]
+              if(!(nextFire.spriteState == FireState.Brick || nextFire.spriteState == FireState.OnFire)) {
+                direction = i
+                break;
+              }
+            }
+            continue
+          } else {
+            nextFire.changeFire()
+            this.currentFire = {
+              position: {
+                x: newPosition.x,
+                y: newPosition.y
+              },
+              direction
+            }
+            this.fires.push(newPosition)
+            break
           }
-          this.fires.push(newPosition)
-          break;
         }
-      }
+    })
+    ChangeEmitter.on('gameover', () => {
+      alert('游戏结束！')
     })
   }
 

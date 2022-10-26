@@ -66,6 +66,11 @@ export default class Map extends Phaser.GameObjects.Sprite {
     this.play(FireState.OnFire)
     this.spriteState = FireState.OnFire
   }
+  changeBrick() {
+    // 设置为火焰
+    this.play(FireState.Brick)
+    this.spriteState = FireState.Brick
+  }
   nearMap(): NearMap[] {
     let maps: NearMap[] = []
     if(this.position?.x && this.position?.y) {
