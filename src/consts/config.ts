@@ -2,7 +2,7 @@
  * Phaser 配置项
  */
 
-export const GameWidth = 800;
+export const GameWidth = 750;
 export const GameHeight = 800;
 export const GameObject = {
   width: 64,

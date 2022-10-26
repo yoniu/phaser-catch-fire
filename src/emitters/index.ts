@@ -1,0 +1,1 @@
+export const ChangeEmitter = new Phaser.Events.EventEmitter()
