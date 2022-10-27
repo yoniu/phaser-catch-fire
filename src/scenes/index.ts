@@ -4,24 +4,32 @@
 
 import CONFIG from "../consts/config";
 
+import Button from "../objects/button";
+
 export default class Index extends Phaser.Scene {
-  private inputKey?: Phaser.Input.Keyboard.Key
   
   constructor() {
     super('Index');
   }
 
   create() {
-    this.add.text((CONFIG.width as number) / 2, (CONFIG.height as number) / 2, "please keydown [ENTER]")
+    this.add.text((CONFIG.width as number) / 2, (CONFIG.height as number) / 2, "抓住小猫")
             .setOrigin(0.5, 0.5)
-
-    this.inputKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     
-  }
-
-  update(): void {
-    if(this.inputKey?.isDown) 
-      this.scene.start('Play')
+    new Button(this, 10, 10, {
+      radius: 15,
+      width: 256, height: 64,
+      text: "开始游戏",
+      textStyle: {
+        fontSize: '24px',
+        color: '#000'
+      },
+      buttonStyle: {
+        bgColor: 0xffff00,
+        bgColorHover: 0xff0000
+      },
+      callback: () => { this.scene.start('Play') }
+    })
   }
 
 }

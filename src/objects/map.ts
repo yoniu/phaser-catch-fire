@@ -72,6 +72,7 @@ export default class Map extends Phaser.GameObjects.Sprite {
     this.spriteState = FireState.Brick
   }
   nearMap(): NearMap[] {
+    // 获取相邻贴图
     let maps: NearMap[] = []
     if(this.position?.x && this.position?.y) {
       maps[NearMapPosition.Left] = { // 左

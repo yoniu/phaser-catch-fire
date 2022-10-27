@@ -102,6 +102,7 @@ export default class Play extends Phaser.Scene {
             continue
           } else {
             nextFire.changeFire()
+            this.pp[x][y].setAlpha(0.6)
             this.currentFire = {
               position: {
                 x: newPosition.x,
