@@ -5,6 +5,8 @@ import { GameObject } from "../consts/config"
 import Fire from "../objects/map"
 import FireState from "../consts/fireState"
 import { ChangeEmitter } from "../emitters"
+import Button from "../objects/button"
+import State from "../consts/state"
 
 export default class Play extends Phaser.Scene {
   //private inputKey?: Phaser.Input.Keyboard.Key
@@ -12,10 +14,14 @@ export default class Play extends Phaser.Scene {
   private container?: Phaser.GameObjects.Container
   private currentFire!: CurrentFire
   private fires: Array<Position> = []
+  private count!: number
   
   constructor() {
     super('Play')
+  }
 
+  init(obj: {count: number}) {
+    this.count = obj.count
   }
 
   create() {
@@ -23,6 +29,35 @@ export default class Play extends Phaser.Scene {
     this.createFire()
     this.createBrick()
     this.initChangeEmitter()
+
+    new Button(this, 750 / 2 + 128 / 2, 676, <ButtonType>{
+      radius: 48 / 2,
+      width: 128, height: 48,
+      text: "重新开始",
+      textStyle: {
+        fontSize: '16px',
+        color: '#000'
+      },
+      buttonStyle: {
+        bgColor: 0xB38E74,
+        bgColorHover: 0xdbcabd
+      },
+      callback: () => { this.scene.restart() }
+    })
+    new Button(this, 750 / 2 - 128 - 128/2, 676, <ButtonType>{
+      radius: 48 / 2,
+      width: 128, height: 48,
+      text: "返回主页",
+      textStyle: {
+        fontSize: '16px',
+        color: '#000'
+      },
+      buttonStyle: {
+        bgColor: 0xB38E74,
+        bgColorHover: 0xdbcabd
+      },
+      callback: () => { this.scene.start('Index') }
+    })
   }
 
   /**
@@ -62,9 +97,9 @@ export default class Play extends Phaser.Scene {
     })
   }
 
+  // 创建砖块
   createBrick() {
-    const count = 20
-    for(let i = 1; i <= count; i++) {
+    for(let i = 1; i <= this.count; i++) {
       const x = this.getRandom(10),
             y = this.getRandom(10)
       if(this.pp[x][y].spriteState == FireState.OnFire || this.pp[x][y].spriteState == FireState.Brick)
@@ -74,14 +109,21 @@ export default class Play extends Phaser.Scene {
     }
   }
 
+  /**
+   * 初始化 Emitter
+   */
   initChangeEmitter() {
+    // 清除 Emitter
+    ChangeEmitter.off('click')
+    ChangeEmitter.off('gameover')
+    // 新建 Emitter
     ChangeEmitter.on('click', () => {
       let direction = this.currentFire.direction
       const {x, y} = this.currentFire.position
       const nearMaps = this.pp[x][y].nearMap()
       let times = 0 // 内循环次数
       if(x == 0 || x == 10 || y == 0 || y == 10)
-        ChangeEmitter.emit('gameover')
+        ChangeEmitter.emit('gameover', State.Fail, this.count)
       else
         while(true) {
           times++
@@ -89,7 +131,7 @@ export default class Play extends Phaser.Scene {
           const nextFire = this.pp[newPosition.x][newPosition.y]
           if(nextFire.spriteState == FireState.Brick || nextFire.spriteState == FireState.OnFire) {
             if(times > 6) {
-              ChangeEmitter.emit('gameover')
+              ChangeEmitter.emit('gameover', State.Success, this.count)
               break
             }
             for(let i = 0; i < nearMaps.length; i++) {
@@ -115,8 +157,15 @@ export default class Play extends Phaser.Scene {
           }
         }
     })
-    ChangeEmitter.on('gameover', () => {
-      alert('游戏结束！')
+    ChangeEmitter.on('gameover', (state: State, count: number) => {
+      let core:number = 0
+      if(state == State.Success) {
+        for(let i = 0; i <= 10; i++)
+          for(let j = 0; j <= 10; j++)
+            if(this.pp[i][j].spriteState == FireState.Grass)
+              core++
+      }
+      this.scene.start('Gameover', {state, count, core})
     })
   }
 

@@ -11,6 +11,7 @@ import CONFIG from './consts/config'
 import Index from './scenes'
 import Loader from './scenes/loader'
 import Play from './scenes/play'
+import Gameover from './scenes/gameover'
 
 const Game = new Phaser.Game(CONFIG)
 
@@ -18,3 +19,4 @@ const Game = new Phaser.Game(CONFIG)
 Game.scene.add('Loader', Loader, true)
 Game.scene.add('Index', Index, false)
 Game.scene.add('Play', Play, false)
+Game.scene.add('Gameover', Gameover, false)

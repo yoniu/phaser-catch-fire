@@ -3,7 +3,7 @@
  */
 
 export const GameWidth = 750;
-export const GameHeight = 800;
+export const GameHeight = 750;
 export const GameObject = {
   width: 64,
   height: 64,

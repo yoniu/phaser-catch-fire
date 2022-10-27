@@ -21,7 +21,7 @@ export default class Button extends Phaser.GameObjects.Container {
 
     // 背景
     this.Rect = new Phaser.GameObjects.Graphics(scene)
-    this.drawBackground(0xffff00)
+    this.drawBackground(bgColor)
     this.add(this.Rect)
 
     // 文字
